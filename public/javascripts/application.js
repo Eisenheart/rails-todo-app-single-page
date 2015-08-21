@@ -17,11 +17,11 @@ Lists.prototype.request = function(url, success) {
 
 Lists.prototype.listAll = function() {
   this.request("http://localhost:3000/lists", function(listsObject, response) {
-    listsObject.pageContainer.html("");
+    // listsObject.pageContainer.html("");
     listsObject.pageContainer.append("<form class = 'add_list_button'><input type='text' name = 'name'><br><input type='submit' value='Submit'></form>");
 
     for(var i = 0; i < response.length; i++) {
-      var link = '<a href="/lists/' + response[i].id + '" class="list">' + response[i].name + '</a>';
+      var link = '<input class = "checkbox" type="checkbox" name=' + response[i].name + '> ' + response[i].name;
       listsObject.pageContainer.append("<div>" + link + "</div>");
     }
   })
@@ -42,13 +42,40 @@ var button_listener =  function() { $( "#page-container" ).on('submit','.add_lis
     dataType: "json"
   }).done(function(response){
     // $('.add_list_button').hide()
-    var link = '<a href="/lists/' + response.id + '" class="list">' + response.name + '</a>';
+    var link = '<input class = "checkbox" type="checkbox" name=' + response.name + '> ' + response.name + '<br>';
     $('#page-container').append("<div>" + link + "</div>");
     }).fail(function(response){
       console.log("fail",response)
     });
 });
 };
+
+var checkbox_listener =  function() { $( ".checkbox" ).change(function(event) {
+  var listObject = this
+  event.preventDefault();
+
+  var listData = $(this).serialize();
+  console.log(listData)
+  // I need a line to check what
+  var url = "http://localhost:3000/lists/" + listObject.id + "/edit";
+  var type = "POST";
+
+  $.ajax({
+    url: url,
+    type: type,
+    data: listData,
+    dataType: "json"
+  }).done(function(response){
+    // $('.add_list_button').hide()
+    console.log("success", response)
+    // var link = '<input class = "checkbox" type="checkbox" name=' + response.name + '> ' + response.name + '<br>';
+    // $('#page-container').append("<div>" + link + "</div>");
+    }).fail(function(response){
+      console.log("fail",response)
+    });
+});
+};
+
 
 // var add_beer_form = $('#addbeer').click(function(event) {
 
@@ -83,6 +110,7 @@ var button_listener =  function() { $( "#page-container" ).on('submit','.add_lis
 var list1 = new Lists;
 list1.listAll();
 button_listener();
+checkbox_listener();
 
 
 
